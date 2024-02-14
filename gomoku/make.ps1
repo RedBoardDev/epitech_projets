@@ -1,0 +1,5 @@
+Set-Location "build"
+Invoke-Expression "msbuild .\pbrain-gomoku-ai.vcxproj /p:Configuration=Release"
+Remove-Item -Path "..\pbrain-gomoku-ai.exe"
+Move-Item -Path ".\Release\pbrain-gomoku-ai.exe" -Destination "..\pbrain-gomoku-ai.exe"
+Set-Location ".."

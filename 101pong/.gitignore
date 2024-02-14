@@ -1,0 +1,13 @@
+*~
+\#*#
+.#*
+*#
+.#*#
+a.out
+vgcore*
+test*
+*.a
+*.o
+.vscode/
+libmy.a
+101pong

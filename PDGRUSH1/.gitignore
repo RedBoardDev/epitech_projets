@@ -1,0 +1,4 @@
+*.hi
+*.o
+pushswap_checker
+test*

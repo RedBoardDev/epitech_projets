@@ -1,0 +1,10 @@
+FROM maven:3.8.7-openjdk-18-slim
+
+SHELL ["/bin/bash", "-c"]
+
+ONBUILD COPY . /app
+ONBUILD WORKDIR /app
+
+ONBUILD RUN mvn package -f pom.xml
+ONBUILD WORKDIR /app/target
+ONBUILD CMD ["java", "-jar", "app.jar"]

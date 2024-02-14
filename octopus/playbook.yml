@@ -1,0 +1,83 @@
+---
+- name: Base
+  hosts: all
+  become: true
+  roles:
+      - base
+
+- name: Postgresql
+  hosts: postgresql
+  become: true
+  roles:
+      - postgresql
+
+- name: Redis
+  hosts: redis
+  become: true
+  roles:
+      - redis
+
+- name: Poll
+  hosts: poll
+  become: true
+  roles:
+      - poll
+
+- name: Result
+  hosts: result
+  become: true
+  roles:
+      - result
+
+- name: Worker
+  hosts: worker
+  become: true
+  roles:
+      - worker
+
+
+# ---
+# - hosts: poll
+#   gather_facts: no
+#   become: yes
+#   become_user: root
+#   tasks:
+#     - name: Calling Poll tasks
+#       ansible.builtin.import_tasks:
+#         file: roles/poll/tasks/main.yml
+
+# - hosts: redis
+#   gather_facts: no
+#   become: yes
+#   become_user: root
+#   tasks:
+#     - name: Calling Redis tasks
+#       ansible.builtin.import_tasks:
+#         file: roles/redis/tasks/main.yml
+
+# - hosts: postgresql
+#   gather_facts: no
+#   become: yes
+#   become_user: root
+#   tasks:
+#     - name: Calling Postgresql tasks
+#       ansible.builtin.import_tasks:
+#         file: roles/postgresql/tasks/main.yml
+
+# - hosts: result
+#   gather_facts: no
+#   become: yes
+#   become_user: root
+#   tasks:
+#     - name: Calling Result tasks
+#       ansible.builtin.import_tasks:
+#         file: roles/result/tasks/main.yml
+
+# - hosts: worker
+#   gather_facts: no
+#   become: yes
+#   become_user: root
+#   tasks:
+#     - name: Calling Worker tasks
+#       ansible.builtin.import_tasks:
+#         file: roles/worker/tasks/main.yml

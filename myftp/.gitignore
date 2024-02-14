@@ -1,0 +1,6 @@
+myftp
+client
+*.o
+.vscode/
+marting.c
+test*

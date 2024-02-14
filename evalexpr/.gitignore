@@ -1,0 +1,11 @@
+main*.c
+*~
+\#*#
+.#*
+*#
+.#*#
+a.out
+vgcore*
+test*
+*.a
+eval_expr

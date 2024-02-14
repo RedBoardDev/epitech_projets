@@ -1,0 +1,11 @@
+.vscode
+a.out
+*.o
+vgcore*
+*.so
+arcade
+bin
+test
+Test/
+*assets/
+scoreboard/

@@ -1,0 +1,12 @@
+.stack-work/
+*~
+oui1
+test1
+citrouille_400_400.txt
+imageCompressor
+imageCompressor.cabal
+test_file2
+src/Main
+a.out
+*.cabal
+test.oui

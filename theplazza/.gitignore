@@ -1,0 +1,9 @@
+*.o
+*.so
+src/*.o
+plazza
+.vscode
+vgcore*
+test
+logs/*
+*.log

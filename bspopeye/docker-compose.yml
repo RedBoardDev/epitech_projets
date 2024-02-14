@@ -1,0 +1,12 @@
+version: '3'
+services:
+  hello_world:
+    build: .
+    ports:
+      - "3000:3000"
+  db:
+    image: postgres:9.4
+    ports:
+      - "5432"
+    environment:
+      - "POSTGRES_PASSWORD=popeye"

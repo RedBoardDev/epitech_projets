@@ -1,0 +1,17 @@
+*~
+\#*#
+.#*
+*#
+.#*#
+a.out
+vgcore*
+test*
+*.a
+*.o
+.vscode/
+libmy.a
+antman/antman
+giantman/giantman
+files_to_compress/*
+NormEZ.rb
+to_crypt

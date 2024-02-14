@@ -1,0 +1,11 @@
+{
+  "expo": {
+    "name": "Survivor",
+    "slug": "Survivor",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  },
+  "name": "Survivor"
+}

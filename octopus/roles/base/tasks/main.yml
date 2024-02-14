@@ -1,0 +1,27 @@
+---
+- name: Update and upgrade system packages
+  become: true
+  ansible.builtin.apt:
+    upgrade: yes
+    update_cache: yes
+    cache_valid_time: 86400
+
+- name: Install useful packages
+  become: true
+  ansible.builtin.apt:
+    name:
+      - git
+      - curl
+      - unzip
+      - zsh
+    update_cache: yes
+    state: present
+
+- name: Configure timezone to Europe/Paris
+  community.general.timezone:
+    name: Europe/Paris
+
+- name: Set zsh as default shell
+  ansible.builtin.user:
+    name: "{{ ansible_env.USER }}"
+    shell: /bin/zsh

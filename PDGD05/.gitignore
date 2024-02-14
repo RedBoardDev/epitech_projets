@@ -1,0 +1,6 @@
+test_main.c
+a.out
+*.a
+*.o
+vgcore.*
+string4.c

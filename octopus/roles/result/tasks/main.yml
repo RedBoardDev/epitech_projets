@@ -1,0 +1,64 @@
+---
+- name: Create directory for result application
+  become: true
+  ansible.builtin.file:
+    path: /etc/result
+    state: directory
+    mode: '0755'
+
+- name: Extract result application archive
+  become: true
+  ansible.builtin.unarchive:
+    src: result.tar
+    dest: /etc/result
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Install nodejs package
+  become: true
+  ansible.builtin.package:
+    name:
+      - nodejs
+      - npm
+    state: present
+
+- name: Install result application python requirements
+  become: true
+  community.general.npm:
+    path: /etc/result
+    state: present
+
+- name: Template result application systemd service
+  ansible.builtin.template:
+    src: result.j2
+    dest: /etc/systemd/system/result.service
+    mode: '0644'
+  register: template_result
+
+- name: Reload systemd configuration
+  become: true
+  ansible.builtin.systemd:
+    daemon_reload: true
+    state: restarted
+    name: result
+  when: template_result.changed
+
+- name: Enable result application service at boot
+  become: true
+  ansible.builtin.systemd:
+    enabled: yes
+    name: result.service
+
+- name: Start result application service
+  become: true
+  ansible.builtin.service:
+    name: result.service
+    state: started
+
+- name: Restart result application service
+  become: true
+  ansible.builtin.service:
+    name: result.service
+    state: restarted
+  when: template_result.changed

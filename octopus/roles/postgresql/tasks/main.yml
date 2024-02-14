@@ -1,0 +1,146 @@
+---
+- name: Install gnupg package
+  become: true
+  ansible.builtin.apt:
+    name:
+      - gnupg
+    state: present
+    update_cache: yes
+  register: install_gnupg
+
+- name: Add postgreSQL gpg key
+  become: true
+  ansible.builtin.apt_key:
+    url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
+    state: present
+  register: install_gpg_key
+  when: install_gnupg
+
+- name: Add postgreSQL repository
+  become: true
+  apt_repository:
+    repo: deb http://apt.postgresql.org/pub/repos/apt/ {{ ansible_distribution_release }}-pgdg main
+    state: present
+    filename: pgdg.list
+    update_cache: yes
+  register: postgres_add_repo
+  when: install_gpg_key
+
+- name: Install postgreSQL 12 and client packages
+  become: true
+  ansible.builtin.apt:
+    name:
+      - postgresql-12
+      - postgresql-client-12
+    state: present
+    update_cache: yes
+  register: install_postgresql
+  when: postgres_add_repo
+
+- name: Install setfacl package
+  ansible.builtin.apt:
+    name: acl
+
+- name: Install python3 and pip packages
+  become: true
+  ansible.builtin.apt:
+    name:
+      - python3
+      - python3-pip
+    state: present
+    update_cache: yes
+
+- name: Install psycopg2 package
+  become: true
+  ansible.builtin.apt:
+    name:
+      - python3-psycopg2
+    state: present
+    update_cache: yes
+
+- name: Copy pg_hba.conf file
+  become: true
+  ansible.builtin.copy:
+    src: pg_hba.conf
+    dest: /etc/postgresql/12/main/pg_hba.conf
+    owner: root
+    group: root
+    mode: 0644
+  register: config_postgresql
+
+- name: Configure postgreSQL to listen on all interfaces
+  lineinfile: dest=/etc/postgresql/12/main/postgresql.conf
+    regexp="listen_addresses =" line="listen_addresses = '*'" state=present
+  register: config_postgresql_listen_addresses
+
+- name: Reload systemd configuration
+  become: true
+  ansible.builtin.systemd:
+    daemon_reload: true
+    state: restarted
+    name: postgresql
+  when: config_postgresql.changed
+
+- name: Enable PostgreSQL application service at boot
+  become: true
+  systemd:
+    name: postgresql
+    enabled: yes
+
+- name: Start PostgreSQL application service
+  ansible.builtin.systemd:
+    name: postgresql
+    state: started
+    enabled: yes
+
+- name: Restart PostgreSQL application service
+  ansible.builtin.systemd:
+    name: postgresql
+    state: started
+    enabled: yes
+  when: install_postgresql.changed
+
+- name: Create paul database
+  postgresql_db:
+    login_user: postgres
+    state: present
+    name: "{{ db_name }}"
+
+- name: Copy schema.sql file
+  ansible.builtin.copy:
+    src: schema.sql
+    dest: /etc/postgresql/12/main/schema.sql
+    owner: root
+    group: root
+    mode: 0644
+  register: copy_schema_file
+
+- name: Apply database schema
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  community.postgresql.postgresql_script:
+    db: "{{ db_name }}"
+    login_user: postgres
+    path: /etc/postgresql/12/main/schema.sql
+  when: copy_schema_file.changed
+
+- name: Create postgreSQL user
+  postgresql_user:
+    login_user: postgres
+    name: "{{ db_username }}"
+    password: "{{ db_password }}"
+    db: "{{ db_name }}"
+    state: present
+
+-   name: Grant table privileges to paul user
+    changed_when: False
+    community.postgresql.postgresql_privs:
+        login_user: postgres
+        database: "{{ db_name }}"
+        state: present
+        privs: SELECT,INSERT,UPDATE
+        type: table
+        objs: "{{ db_table_votes }}"
+        schema: public
+        roles: "{{ db_username }}"
+        grant_option: true

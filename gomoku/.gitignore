@@ -1,0 +1,9 @@
+/build/
+*.exe
+pbrain-gomoku-ai
+a.out
+test.cpp
+*.o
+*.log
+/logs/
+/.vscode/

@@ -1,0 +1,7 @@
+*.o
+vgcore.*
+*.so
+test*
+a.out
+main*
+.vscode/

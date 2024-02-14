@@ -1,0 +1,3 @@
+ansible.cfg
+production.yml
+.vault_pass

@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: cadvisor
+  namespace: kube-system
+  annotations:
+      seccomp.security.alpha.kubernetes.io/pod: 'docker/default'
+spec:
+  selector:
+    matchLabels:
+      name: cadvisor
+  template:
+    metadata:
+      labels:
+        name: cadvisor
+    spec:
+      serviceAccountName: cadvisor
+      containers:
+      - name: cadvisor
+        image: gcr.io/cadvisor/cadvisor:latest
+        resources:
+          requests:
+            memory: 400Mi
+            cpu: 400m
+          limits:
+            memory: 2000Mi
+            cpu: 800m
+        volumeMounts:
+        - name: rootfs
+          mountPath: /var/log/rootfs
+          readOnly: true
+        - name: var-run
+          mountPath: /var/log/var-run
+          readOnly: true
+        - name: sys
+          mountPath: /var/log/sys
+          readOnly: true
+        - name: docker
+          mountPath: /var/log/docker
+          readOnly: true
+        - name: disk
+          mountPath: /var/log/disk
+          readOnly: true
+        ports:
+          - name: http
+            containerPort: 8080
+            protocol: TCP
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: rootfs
+        hostPath:
+          path: /var/log/rootfs
+      - name: var-run
+        hostPath:
+          path: /var/log/var-run
+      - name: sys
+        hostPath:
+          path: /var/log/sys
+      - name: docker
+        hostPath:
+          path: /var/log/docker
+      - name: disk
+        hostPath:
+          path: /var/log/disk
+      restartPolicy: Always

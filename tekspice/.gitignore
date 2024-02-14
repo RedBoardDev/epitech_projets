@@ -1,0 +1,25 @@
+# config files
+.vscode/
+launch.json
+.env
+
+# useless files
+*~
+\#*#
+.#*
+*#
+.#*#
+
+# c
+*.a
+*.o
+vgcore*
+unit_tests*
+a.out
+my_bin
+nanotekspice
+
+# test files
+test*
+zip/
+log.bin

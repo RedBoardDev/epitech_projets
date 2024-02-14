@@ -1,0 +1,1 @@
+/home/martin/a_code/etipek/tek3/survivornext/android/app/build/intermediates/cxx/Debug/4g95i5k1/obj/arm64-v8a

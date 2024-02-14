@@ -1,0 +1,9 @@
+#!/bin/bash
+# Kill the current instance
+docker-compose -f docker-compose.yml down
+
+# Build the instance
+docker-compose build
+
+# Restart the instance
+docker-compose -f docker-compose.yml up -d

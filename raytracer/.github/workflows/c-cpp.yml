@@ -1,0 +1,23 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Update apt-get
+      run: sudo apt-get update
+    - name: Install libconfig++
+      run: sudo apt-get install -y libconfig-dev
+    - name: Other libconfig++ dependencies
+      run: sudo apt-get install -y libconfig++-dev
+    - name: Does It Compile ?
+      run: make -k -i

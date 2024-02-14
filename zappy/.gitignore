@@ -1,0 +1,38 @@
+# config files
+.vscode/
+launch.json
+.env
+
+# useless files
+*~
+\#*#
+.#*
+*#
+.#*#
+__pycache__
+
+# c
+*.a
+*.o
+vgcore*
+unit_tests*
+a.out
+my_bin
+zappy_server
+zappy_gui
+zappy_ai
+
+# test files
+test*
+tmp/
+*db*.txt
+client_test.c
+client_test
+zappy_server_sub
+client
+logs/
+out.txt
+perf.data*
+start_ia.sh
+tetsfeur
+*.log

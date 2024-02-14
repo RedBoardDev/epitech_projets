@@ -1,0 +1,67 @@
+---
+- name: Create directory for worker application
+  become: true
+  ansible.builtin.file:
+    path: /etc/worker
+    state: directory
+    mode: '0755'
+
+- name: Check that pom.xml exists
+  ansible.builtin.stat:
+    path: /etc/worker/pom.xml
+  register: pom_xml
+
+- name: Extract worker application archive
+  become: true
+  ansible.builtin.unarchive:
+    src: worker.tar
+    dest: /etc/worker
+    owner: root
+    group: root
+    mode: '0755'
+  when: not pom_xml.stat.exists
+
+- name: Install Maven and JDK from Java
+  become: true
+  ansible.builtin.package:
+    name:
+      - maven
+      - default-jdk
+    update_cache: yes
+    state: present
+  register: install_maven
+
+- name: Build worker application with Maven
+  ansible.builtin.command: mvn clean package -f /etc/worker/pom.xml
+  when: install_maven
+
+- name: Template worker application systemd service
+  ansible.builtin.template:
+    src: worker.j2
+    dest: /etc/systemd/system/worker.service
+    mode: '0644'
+  register: template_worker
+
+- name: Reload systemd configuration
+  become: true
+  ansible.builtin.systemd:
+    daemon_reload: true
+    state: restarted
+    name: worker
+  when: template_worker.changed
+
+- name: Enable worker application service at boot
+  ansible.builtin.service:
+    name: worker.service
+    enabled: yes
+
+- name: Start worker application service
+  ansible.builtin.service:
+    name: worker.service
+    state: started
+
+- name: Restart worker application service
+  ansible.builtin.service:
+    name: worker.service
+    state: restarted
+  when: template_worker.changed

@@ -1,0 +1,56 @@
+#! /usr/bin/python3
+
+import sys
+import help
+import hubAlgo
+from rsaAlgo import generateRSAKeys
+
+if __name__ == "__main__":
+    try:
+        if len(sys.argv) < 3:
+            raise Exception("Tkt pas")
+        if sys.argv[1] == "-h":
+            help.help()
+
+        algoType = -1
+        if (sys.argv[1] == "-xor"):
+            algoType = 0
+            # print("-xor")
+        elif (sys.argv[1] == "-aes"):
+            algoType = 1
+            # print("-aes")
+        elif (sys.argv[1] == "-rsa"):
+            algoType = 2
+            # print("-rsa")
+        else:
+            raise Exception("Bad usage for first argument")
+
+        mode = -1
+        if (sys.argv[2] == "-c"):
+            mode = 0
+            # print("-c")
+        elif (sys.argv[2] == "-d"):
+            mode = 1
+            # print("-d")
+        elif (sys.argv[2] == "-g") and (sys.argv[1] == "-rsa"):
+            # print("-g")
+            p = sys.argv[3]
+            q = sys.argv[4]
+            generateRSAKeys(p, q)
+            sys.exit(0)
+        else:
+            raise Exception("Bad usage for second argument")
+
+        blockMode = -1
+        if (sys.argv[3] == '-b'):
+            blockMode = 1
+            # print("-b")
+            key = sys.argv[4]
+        else:
+            blockMode = 0
+            key = sys.argv[3]
+        hubAlgo.hubAlgo(algoType, mode, blockMode, key)
+
+    except Exception as e:
+        print("Error:", e, file=sys.stderr)
+        sys.exit(84)

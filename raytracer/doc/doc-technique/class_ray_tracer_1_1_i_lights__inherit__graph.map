@@ -1,0 +1,5 @@
+<map id="RayTracer::ILights" name="RayTracer::ILights">
+<area shape="rect" id="node1" title=" " alt="" coords="115,5,241,119"/>
+<area shape="rect" id="node2" href="$class_ray_tracer_1_1_ambient_light.html" title=" " alt="" coords="5,167,170,328"/>
+<area shape="rect" id="node3" href="$class_ray_tracer_1_1_directional.html" title=" " alt="" coords="194,167,344,328"/>
+</map>

@@ -1,0 +1,47 @@
+---
+- name: Install redis package
+  become: true
+  ansible.builtin.apt:
+    name:
+      - redis-server
+    update_cache: yes
+    state: latest
+
+- name: Copy redis configuration
+  become: true
+  ansible.builtin.copy:
+    src: ../files/redis.conf
+    dest: /etc/redis/redis.conf
+    owner: root
+    group: root
+    mode: 0644
+  register: config_redis
+
+- name: Reload systemd configuration
+  become: true
+  ansible.builtin.systemd:
+    daemon_reload: true
+    state: restarted
+    name: redis
+  when: config_redis.changed
+
+- name: Enable redis application service at boot
+  become: true
+  ansible.builtin.systemd:
+    name: redis-server.service
+    enabled: yes
+
+- name: Start redis application service
+  become: true
+  systemd:
+    name: redis-server.service
+    enabled: yes
+    state: started
+  register: redis_service
+
+- name: Restart redis application service
+  become: true
+  ansible.builtin.systemd:
+    name: redis-server.service
+    state: restarted
+  when: config_redis.changed

@@ -1,0 +1,13 @@
+[Unit]
+Description=Worker Service
+
+[Service]
+Environment=POSTGRESQL_DB={{ db_name }}
+Environment=POSTGRESQL_PORT={{ db_port }}
+Environment=POSTGRESQL_USER={{ db_username }}
+Environment=POSTGRESQL_PASSWORD={{ db_password }}
+Environment=REDIS_HOST={{ hostvars['redis'].ansible_host }}
+Environment=POSTGRESQL_HOST={{ hostvars['postgresql'].ansible_host }}
+WorkingDirectory=/etc/worker
+ExecStart=java -jar /etc/worker/target/worker-jar-with-dependencies.jar
+Restart=always

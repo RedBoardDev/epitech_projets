@@ -1,0 +1,255 @@
+#! /usr/bin/python3
+
+import argparse
+import sys
+import os
+
+# part 1
+
+def find_degree_of_separation(graph, source, target):
+    checked = []
+    queue = [(source, 0)]
+
+    while queue:
+        person, degree = queue.pop(0)
+        if person == target:
+            return degree
+        if person in checked:
+            continue
+        checked.append(person)
+        if person in graph:
+            for friend in graph[person]:
+                queue.append((friend, degree + 1))
+    return (-1)
+
+# part 2
+
+def create_empty_matrix(size):
+    matrix = []
+
+    for i in range(size):
+        row = []
+        for j in range(size):
+            row.append(0)
+        matrix.append(row)
+    return (matrix)
+
+def calculate_degree(graph, person1, person2, max_degree):
+    if person1 == person2:
+        return (0)
+    degree = find_degree_of_separation(graph, person1, person2)
+    if degree <= max_degree:
+        return (degree)
+    else:
+        return (0)
+
+def generate_relationship_matrix(graph, max_degree):
+    names = sorted(graph.keys())
+    matrix = create_empty_matrix(len(names))
+
+    for i in range(len(names)):
+        for j in range(i, len(names)):
+            person1 = names[i]
+            person2 = names[j]
+            degree = calculate_degree(graph, person1, person2, max_degree)
+            matrix[i][j] = degree
+            matrix[j][i] = degree
+    return (matrix)
+
+def format_matrix(matrix):
+    formatted_matrix = ""
+
+    for row in matrix:
+        for item in row:
+            formatted_matrix += str(item) + " "
+        formatted_matrix += "\n"
+    return (formatted_matrix)
+
+# parsing
+
+def parse_relationship(file_content, separator):
+    graph = {}
+    sorted_graph = {}
+
+    for line in file_content:
+        parts = line.strip().split(separator)
+        if len(parts) == 2:
+            person1, person2 = parts
+            if person1 in graph:
+                graph[person1].append(person2)
+            else:
+                graph[person1] = [person2]
+
+            if person2 in graph:
+                graph[person2].append(person1)
+            else:
+                graph[person2] = [person1]
+
+    for key in sorted(graph.keys()):
+        sorted_graph[key] = sorted(graph[key])
+    return (sorted_graph)
+
+
+def parse_relationship_one_person(file_content, separator):
+    graph = {}
+    sorted_graph = {}
+
+    for line in file_content:
+        parts = line.strip().split(separator)
+        if len(parts) == 2:
+            person1, person2 = parts
+            if person1 in graph:
+                graph[person1].append(person2)
+            else:
+                graph[person1] = [person2]
+
+    for key in sorted(graph.keys()):
+        sorted_graph[key] = sorted(graph[key])
+    return (sorted_graph)
+
+
+def check_conspiracies_list(conspiraciesList, cerseiTarget):
+    for target in cerseiTarget:
+        found = False
+        for item in conspiraciesList:
+            if item[1] == target:
+                found = True
+                break
+        if not found:
+            return ("There is only one way out: treason !")
+    return ("The Crown is safe !")
+
+
+def parse_relationship_second_person(file_content, separator):
+    graph = {}
+    sorted_graph = {}
+
+    for line in file_content:
+        parts = line.strip().split(separator)
+        if len(parts) == 2:
+            person1, person2 = parts
+
+            if person2 in graph:
+                graph[person2].append(person1)
+            else:
+                graph[person2] = [person1]
+
+    for key in sorted(graph.keys()):
+        sorted_graph[key] = sorted(graph[key])
+    return (sorted_graph)
+
+
+def check_keys(graph, crGraph):
+    for key in crGraph.keys():
+        if key not in graph.keys():
+            return (False)
+    return (True)
+
+def main():
+
+    parser = argparse.ArgumentParser()
+    group = parser
+    group.add_argument('--links',
+        nargs=3,
+        metavar=('friendshipLink', 'p1', 'p2'),
+        help='file containing friendship relations between people and two people in the friendships file')
+    group.add_argument('--plots',
+        nargs=3,
+        metavar=('friendshipLink', 'cr', 'n'),
+        help='file containing friendship relations between people, file containing conspiracies intentions, and maximum length of friendship paths')
+    try:
+        args = parser.parse_args()
+    except SystemExit:
+        sys.exit(84)
+
+    if not (args.links or args.plots):
+        print(f"Error: No arguments.")
+        sys.exit(84)
+
+    if args.links:
+        friendshipLink, p1, p2 = args.links
+
+        try:
+            if os.path.getsize(friendshipLink) == 0:
+                print(f"Error: The file '{friendshipLink}' is empty.")
+                sys.exit(84)
+            with open(friendshipLink, "r") as file:
+                file_content = file.readlines()
+            parsed_graph = parse_relationship(file_content, ' is friends with ')
+            if (len(parsed_graph) == 0):
+                sys.exit(0)
+            degree_of_separation = find_degree_of_separation(parsed_graph, p1, p2)
+            print(f"Degree of separation between {p1} and {p2}: {degree_of_separation}")
+
+        except FileNotFoundError:
+            print(f"Error: The file '{friendshipLink}' was not found.")
+            sys.exit(84)
+
+    else:
+        friendshipLink, cr, max_degree = args.plots
+        if (not max_degree.isdigit()):
+            sys.exit(84)
+        try:
+            if os.path.getsize(friendshipLink) == 0:
+                print(f"Error: The file '{friendshipLink}' is empty.")
+                sys.exit(84)
+            with open(friendshipLink, "r") as file:
+                file_content = file.readlines()
+            try:
+                if os.path.getsize(cr) == 0:
+                    print(f"Error: The file '{cr}' is empty.")
+                    sys.exit(84)
+                with open(cr, "r") as file:
+                    file_content2 = file.readlines()
+
+                graph = parse_relationship(file_content, ' is friends with ')
+                if (len(graph) == 0):
+                    sys.exit(84)
+                crGraph = parse_relationship_one_person(file_content2, ' is plotting against ')
+                if (len(crGraph) == 0):
+                    sys.exit(84)
+                if (check_keys(graph, crGraph) == False):
+                    sys.exit(84)
+
+                print("Names:")
+                for name in sorted(graph.keys()):
+                    print(name)
+                print("\nRelationships:")
+                matrix = generate_relationship_matrix(graph, int(max_degree))
+
+                formated_matrix = format_matrix(matrix)
+                print(formated_matrix)
+                cerseiTarget = parse_relationship_second_person(file_content2, ' is plotting against ')
+                if ('Cersei Lannister' not in cerseiTarget):
+                    print('Result:\nThe Crown is safe !\n')
+                    sys.exit(0)
+                cerseiTarget = cerseiTarget['Cersei Lannister']
+
+                print('Conspiracies:')
+                conspiraciesList = {}
+                for key in cerseiTarget:
+                    for i in crGraph:
+                        if (key in crGraph[i]):
+                            if (find_degree_of_separation(graph, i, key) <= int(max_degree)):
+                                conspiraciesList[i] = key
+                conspiraciesList = sorted(conspiraciesList.items())
+                for item in conspiraciesList:
+                    print(f"{item[0]} -> {item[1]}")
+
+                print("\nResult:")
+                print(check_conspiracies_list(conspiraciesList, cerseiTarget))
+
+
+            except FileNotFoundError:
+                print(f"Error: The file '{cr}' was not found.")
+                sys.exit(84)
+        except FileNotFoundError:
+            print(f"Error: The file '{friendshipLink}' was not found.")
+            sys.exit(84)
+
+if __name__ == "__main__":
+    try:
+        main()
+    except Exception as e:
+        print("Tkt pas")
+        sys.exit(84)

@@ -1,0 +1,16 @@
+.vscode/
+*~
+\#*#
+.#*
+*#
+.#*#
+
+*.o
+vgcore.*
+unit_tests*
+a.out
+raytracer
+*.ppm
+*.txt
+logs/*
+*.so

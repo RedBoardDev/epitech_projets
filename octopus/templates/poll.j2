@@ -1,0 +1,8 @@
+[Unit]
+Description=Poll Service
+
+[Service]
+Environment=REDIS_HOST={{ hostvars['redis'].ansible_host }}
+WorkingDirectory=/etc/poll/
+ExecStart=flask run --host=0.0.0.0
+Restart=always

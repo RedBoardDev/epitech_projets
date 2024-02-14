@@ -1,0 +1,13 @@
+[Unit]
+Description=Result Service
+
+[Service]
+Environment=PORT=3000
+Environment=POSTGRESQL_DB={{ db_name }}
+Environment=POSTGRESQL_PORT={{ db_port }}
+Environment=POSTGRESQL_USER={{ db_username }}
+Environment=POSTGRESQL_PASSWORD={{ db_password }}
+Environment=POSTGRESQL_HOST={{ hostvars['postgresql'].ansible_host }}
+WorkingDirectory=/etc/result
+ExecStart=node server.js
+Restart=always
